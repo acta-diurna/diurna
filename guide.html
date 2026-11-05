@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diurna 使い方ガイド</title>
+<meta name="description" content="Diurna（ディウルナ）は、ニュース・天気・防災・電車の運行情報をひとつにまとめた、自分専用のニュースアプリです。">
+<meta name="theme-color" content="#0d0f13">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{
+  --bg:#0d0f13; --bg2:#12151b; --card:#171a21; --line:#262a33; --tx:#e9ebf0; --sub:#9aa1ad;
+  --pp:#9d7bea; --pp2:#7c5ce0; --ppbg:rgba(157,123,234,.13);
+  --blue:#5aa2ff; --red:#ff6b6b; --orange:#ffb454; --green:#4fd18b;
+  --r:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.8 system-ui,-apple-system,"Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;overflow-x:hidden}
+a{color:var(--pp)}
+img{max-width:100%;display:block}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+.serif{font-family:Georgia,"Times New Roman",serif}
+
+/* 上の帯 */
+.top{position:sticky;top:0;z-index:5;background:rgba(13,15,19,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:10px;height:56px}
+.top img{width:30px;height:30px;border-radius:8px}
+.top b{font-size:19px;letter-spacing:.02em}
+.top nav{margin-left:auto;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.top nav::-webkit-scrollbar{display:none}
+.top nav a{color:var(--sub);text-decoration:none;font-size:14px;padding:6px 10px;border-radius:999px;white-space:nowrap}
+.top nav a:hover{background:var(--card);color:var(--tx)}
+
+/* 最初の大きな見出し */
+.hero{padding:64px 0 40px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-40% -20% auto auto;width:720px;height:720px;background:radial-gradient(closest-side,rgba(124,92,224,.35),transparent);pointer-events:none}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;position:relative}
+.hero .icon{width:84px;height:84px;border-radius:22px;box-shadow:0 10px 40px rgba(124,92,224,.35)}
+.hero h1{font-size:64px;line-height:1.05;margin:22px 0 6px;letter-spacing:.01em}
+.hero .yomi{color:var(--sub);font-size:14px;letter-spacing:.2em}
+.hero .lead{font-size:21px;line-height:1.7;margin:22px 0 28px}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:12px 22px;border-radius:999px;font-weight:700;text-decoration:none;font-size:15px}
+.btn.pri{background:var(--pp);color:#fff}
+.btn.pri:hover{background:var(--pp2)}
+.btn.sec{background:var(--card);color:var(--tx);border:1px solid var(--line)}
+.hero .shots{display:flex;gap:16px;justify-content:center;align-items:flex-end}
+.hero .shots .phone:nth-child(2){transform:translateY(30px)}
+
+/* スマホの枠 */
+.phone{width:240px;flex:none;border-radius:34px;padding:8px;background:#05060a;border:1px solid #2b2f38;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.phone img{border-radius:26px;width:100%;aspect-ratio:390/844;object-fit:cover;object-position:top}
+.phone.scroll .in{border-radius:26px;aspect-ratio:390/844;overflow-y:auto;scrollbar-width:none}
+.phone.scroll .in::-webkit-scrollbar{display:none}
+.phone.scroll img{aspect-ratio:auto;border-radius:0}
+.pc{border-radius:12px;overflow:hidden;border:1px solid #2b2f38;box-shadow:0 20px 50px rgba(0,0,0,.5);background:#05060a}
+.pc .bar{height:26px;display:flex;gap:6px;align-items:center;padding:0 12px;background:#1a1d24}
+.pc .bar i{width:10px;height:10px;border-radius:50%;background:#3a3f4a}
+.cap{font-size:13px;color:var(--sub);text-align:center;margin-top:10px}
+
+/* 区切り */
+section{scroll-margin-top:56px;padding:56px 0;border-top:1px solid var(--line)}
+section:nth-of-type(even){background:var(--bg2)}
+h2{font-size:30px;margin:0 0 6px;line-height:1.4}
+h2 small{display:block;font-size:13px;color:var(--pp);letter-spacing:.2em;font-weight:700;margin-bottom:4px}
+.intro{color:var(--sub);margin:0 0 32px;max-width:720px}
+h3{font-size:20px;margin:0 0 8px;line-height:1.5}
+
+/* できること */
+.feats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.feat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.feat .e{font-size:26px;line-height:1}
+.feat b{display:block;margin:10px 0 4px;font-size:16px}
+.feat p{margin:0;color:var(--sub);font-size:14px;line-height:1.7}
+
+/* 始め方 */
+.devs{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.dev{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.dev h3 span{font-size:13px;color:var(--sub);font-weight:400;margin-left:6px}
+ol.steps{counter-reset:s;list-style:none;margin:12px 0 0;padding:0}
+ol.steps li{counter-increment:s;position:relative;padding:0 0 12px 40px}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:26px;height:26px;border-radius:50%;background:var(--ppbg);color:var(--pp);font-weight:800;font-size:14px;display:grid;place-items:center}
+.key{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.key .phone{width:200px}
+.note{border-left:3px solid var(--orange);background:rgba(255,180,84,.08);padding:10px 14px;border-radius:0 10px 10px 0;font-size:14px;margin:14px 0 0}
+.note.ok{border-color:var(--green);background:rgba(79,209,139,.08)}
+
+/* 使い方（写真＋説明） */
+.row{display:grid;grid-template-columns:260px 1fr;gap:36px;align-items:start;margin:0 0 48px}
+.row:last-child{margin-bottom:0}
+.row.rev{grid-template-columns:1fr 260px}
+.row.rev .phone{order:2}
+.row ul{margin:8px 0 0;padding-left:1.2em}
+.row li{margin:4px 0}
+.row li b{color:var(--tx)}
+.row .txt{padding-top:8px}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--ppbg);color:var(--pp);margin-bottom:8px}
+kbd{font:inherit;font-size:.9em;background:var(--card);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:0 6px;white-space:nowrap}
+
+/* 設定 */
+.sets{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.set{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.set img{aspect-ratio:390/420;object-fit:cover;object-position:top;border-bottom:1px solid var(--line)}
+.set div{padding:14px 16px}
+.set b{display:block;margin-bottom:4px}
+.set p{margin:0;font-size:14px;color:var(--sub);line-height:1.7}
+
+/* よくある質問 */
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:0 0 10px;padding:0 18px}
+summary{cursor:pointer;padding:15px 0;font-weight:700;list-style:none;position:relative;padding-right:28px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";position:absolute;right:0;top:10px;font-size:22px;color:var(--pp);font-weight:400}
+details[open] summary::after{content:"−"}
+details p,details ul{margin:0 0 16px;color:var(--sub)}
+details ul{padding-left:1.2em}
+
+footer{padding:40px 0 56px;border-top:1px solid var(--line);color:var(--sub);font-size:14px}
+footer .wrap{display:flex;gap:20px;align-items:center}
+footer img{width:44px;height:44px;border-radius:12px}
+
+@media (max-width:860px){
+  .hero{padding:40px 0 24px}
+  .hero .wrap{grid-template-columns:1fr;gap:28px}
+  .hero h1{font-size:48px}
+  .hero .lead{font-size:18px}
+  .hero .shots .phone{width:44%;max-width:220px}
+  .hero .shots .phone:nth-child(2){transform:translateY(20px)}
+  .feats{grid-template-columns:repeat(2,1fr)}
+  .devs{grid-template-columns:1fr}
+  .sets{grid-template-columns:repeat(2,1fr)}
+  .row,.row.rev{grid-template-columns:1fr;gap:18px}
+  .row.rev .phone{order:0}
+  .row .phone{margin:0 auto;width:230px}
+  .key{grid-template-columns:1fr}
+  .key .phone{margin:0 auto}
+  h2{font-size:25px}
+  section{padding:44px 0}
+  .top nav a{padding:6px 8px;font-size:13px}
+}
+@media (max-width:520px){
+  .top nav{display:none}
+  .feats{grid-template-columns:1fr 1fr;gap:10px}
+  .feat{padding:14px}
+  .sets{grid-template-columns:1fr}
+  .pcwide{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <img src="icon-192.png" alt="">
+    <b class="serif">Diurna</b>
+    <nav>
+      <a href="#feat">できること</a>
+      <a href="#start">始め方</a>
+      <a href="#use">使い方</a>
+      <a href="#settings">設定</a>
+      <a href="#faq">よくある質問</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <img class="icon" src="icon-192.png" alt="Diurna のアイコン">
+      <h1 class="serif">Diurna</h1>
+      <div class="yomi">ディウルナ ・ ラテン語で「毎日の」</div>
+      <p class="lead">ニュース・天気・防災・電車の運行情報を、<br>ひとつのアプリにまとめた、自分専用のニュースアプリです。</p>
+      <div class="btns">
+        <a class="btn pri" href="./">Diurna を開く</a>
+        <a class="btn sec" href="#start">始め方を見る</a>
+      </div>
+    </div>
+    <div class="shots">
+      <div class="phone"><img src="guide/home.jpg" alt="ホームの画面"></div>
+      <div class="phone"><img src="guide/news.jpg" alt="ニュースのタブの画面"></div>
+    </div>
+  </div>
+</div>
+
+<section id="feat">
+  <div class="wrap">
+    <h2><small>FEATURES</small>できること</h2>
+    <p class="intro">いろいろなニュースサイトの記事を、ジャンル別のタブで読めます。毎日見たい情報もホームにまとまっていて、iPhone・iPad・PC のどれからでも同じ設定で使えます。</p>
+    <div class="feats">
+      <div class="feat"><div class="e">🏠</div><b>ホーム</b><p>天気・暦・連休・AI のまとめ・話題のキーワード・発売日などを1画面に。</p></div>
+      <div class="feat"><div class="e">📰</div><b>ジャンル別のタブ</b><p>好きなサイトを入れたタブを、横にスワイプして読みます。</p></div>
+      <div class="feat"><div class="e">☀️</div><b>天気</b><p>3か所まで。3時間ごと・週間・服装の目安・雨雲レーダー。</p></div>
+      <div class="feat"><div class="e">⚠️</div><b>防災</b><p>気象庁の警報・注意報と地震。上の帯でいつでも分かります。</p></div>
+      <div class="feat"><div class="e">🚃</div><b>運行情報</b><p>よく乗る路線を3つまで。遅れや見合わせがひと目で分かります。</p></div>
+      <div class="feat"><div class="e">🔔</div><b>お知らせ</b><p>朝のまとめ・電車の遅れ・雨・警報を、メールやプッシュ通知で。</p></div>
+      <div class="feat"><div class="e">✨</div><b>AI 要約</b><p>記事を3行に。ホームでは今日のニュースのまとめも。</p></div>
+      <div class="feat"><div class="e">🔖</div><b>あとで読む・検索</b><p>気になる記事を取っておけます。全タブの記事から探せます。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <h2><small>GETTING STARTED</small>始め方</h2>
+    <p class="intro">端末ごとに1回だけ、ホーム画面（PC はアプリ）に追加して、合言葉を入れます。2台目からは、使っている端末から送るリンクを開くだけです。</p>
+    <div class="devs">
+      <div class="dev">
+        <h3>iPhone・iPad<span>Safari で</span></h3>
+        <ol class="steps">
+          <li>Safari で <a href="./">acta-diurna.github.io/diurna</a> を開きます。</li>
+          <li>下（iPad は上）の「共有」ボタン（□に↑）→「ホーム画面に追加」→「追加」。</li>
+          <li><b>ホーム画面にできた Diurna のアイコン</b>から開きます。</li>
+          <li>合言葉を貼り付けて「はじめる」。</li>
+        </ol>
+        <p class="note">ホーム画面のアプリは Safari と保存場所が別です。合言葉は、ホーム画面から開いたほうで入れてください。プッシュ通知も、ホーム画面から開いたときだけ使えます。</p>
+      </div>
+      <div class="dev">
+        <h3>PC<span>Chrome か Edge で</span></h3>
+        <ol class="steps">
+          <li>Diurna を開いて、合言葉を入れます。</li>
+          <li>アプリとして追加します（専用のウィンドウで開けます）。
+            <br><b>Chrome</b>：アドレス欄の右端の「インストール」のマーク
+            <br><b>Edge</b>：右上の「…」→「アプリ」→「このサイトをアプリとしてインストール」</li>
+          <li>追加したアプリで合言葉を聞かれたら、もう一度入れます。</li>
+          <li>タスクバーにピン留めしておくと便利です。</li>
+        </ol>
+      </div>
+    </div>
+    <div class="key">
+      <div class="phone"><img src="guide/key.jpg" alt="合言葉を入れる画面" loading="lazy"></div>
+      <div>
+        <h3>合言葉について</h3>
+        <ul>
+          <li>Diurna は、<b>合言葉を知っている人だけ</b>が使えます。一度入れれば、その端末では次から聞かれません。</li>
+          <li><b>2台目から</b>：使っている端末で ⚙︎ →「Diurna（アプリ版）と合言葉」→「ほかの端末用のリンクをコピー」。LINE やメモで新しい端末に送って開くと、合言葉が自動で入ります。</li>
+          <li>合言葉を知っている人には、あなたの設定（タブ・天気の場所・あとで読むなど）がそのまま見えます。人には教えないでください。</li>
+          <li>漏れたかもしれないときは、⚙︎ の「合言葉を作り直す」を5秒以内に2回押します。古い合言葉はすぐ使えなくなり、ほかの端末では新しい合言葉を入れ直します。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="use">
+  <div class="wrap">
+    <h2><small>HOW TO USE</small>使い方</h2>
+    <p class="intro">上の帯には、天気・警報・電車の状態がいつも出ています。押すと、それぞれの詳しいページが開きます。右上のボタンは左から <kbd>検索</kbd> <kbd>あとで読む</kbd> <kbd>更新</kbd> <kbd>⚙︎ 設定</kbd> です。</p>
+
+    <div class="row">
+      <div class="phone scroll"><div class="in"><img src="guide/home.jpg" alt="ホームの画面（下へ動かせます）" loading="lazy"></div></div>
+      <div class="txt">
+        <span class="tag">🏠 ホーム</span>
+        <h3>毎日見たいものを、上から順に</h3>
+        <p>タブの並びの先頭が「ホーム」です。左の写真は、指（マウスのホイール）で下へ動かせます。</p>
+        <ul>
+          <li><b>台風・天気・暦</b>：台風は近づいているときだけ出ます。天気のカードには、傘・服装・紫外線・PM2.5 と、もうすぐ降り出す・やむなどの変化も出ます。</li>
+          <li><b>連休・AI 今日のまとめ</b>：次の連休まであと何日か。朝・昼・夜に、その日のニュースを AI が数行にまとめます（AI 要約の設定が必要）。</li>
+          <li><b>検索・注目ワード・続きを読む</b>：Google や Amazon などをすぐ検索できます。注目ワードを含む新しい記事や、読みかけのタブ・あとで読むも並びます。</li>
+          <li><b>よく使うサイト・いま話題</b>：よく開くサイトのボタンと、Google トレンドの急上昇ワードや、ジャンル別によく読まれている記事。</li>
+          <li><b>発売・公開・展覧会</b>：今週のゲーム・映画・ガジェットの発売日と、近くの美術館の展覧会。「もっと見る」でカレンダーになります。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row rev">
+      <div class="phone"><img src="guide/home-edit.jpg" alt="ホームの並び替えの画面" loading="lazy"></div>
+      <div class="txt">
+        <span class="tag">⇅ 並び替え</span>
+        <h3>ホームの欄は、並べ替え・非表示ができます</h3>
+        <ul>
+          <li>あいさつの右の「⇅ 並び替え」を押します。</li>
+          <li>☰ をつかんでドラッグするか、↑↓ で順番を変えます。</li>
+          <li>使わない欄は「非表示」に。非表示の欄はデータも読み込まないので、ホームが速くなります。</li>
+          <li>並びは PC とスマホで共通です。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="phone"><img src="guide/news.jpg" alt="ニュースのタブの画面" loading="lazy"></div>
+      <div class="txt">
+        <span class="tag">📰 ニュースのタブ</span>
+        <h3>横にスワイプして、タブを切り替え</h3>
+        <ul>
+          <li>タブ名の横の数字は、前回そのタブを開いたあとに増えた記事の数です。</li>
+          <li>記事を押すと、そのサイトで開きます。読んだ記事は薄く表示されます（PC とスマホで共通）。</li>
+          <li><b>前回の続きへ ↓</b>：前回読んだところまで飛びます。「▲ ここより上が新着」の線から上が新しい記事です。</li>
+          <li>同じ話題の記事がほかのサイトにもあると「ほか○件」にまとまります。</li>
+          <li>記事の下の <b>🔖</b> であとで読むに、<b>共有</b> で LINE・メール・リンクのコピー、<b>要約</b> で AI の3行要約。</li>
+          <li>上の選択で「新しい順／サイト別」と「標準／写真大きめ／見出しだけ」を切り替えられます（タブごとに覚えます）。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row rev">
+      <div class="phone"><img src="guide/weather.jpg" alt="天気の画面" loading="lazy"></div>
+      <div class="txt">
+        <span class="tag">☀️ 天気</span>
+        <h3>上の帯の気温を押すと、天気のページ</h3>
+        <ul>
+          <li>今の天気・3時間ごと（48時間）・週間（8日）を見られます。</li>
+          <li>服装・紫外線・PM2.5 の目安と、その場所の警報・注意報も出ます。</li>
+          <li>「雨雲レーダー」で、気象庁の雨雲の動きをその場所を中心に開きます。</li>
+          <li>「🔍 ほかの場所」で、登録していない場所の天気もその場で調べられます。</li>
+          <li>ニュースのタブを押すと元に戻ります。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="phone"><img src="guide/bosai.jpg" alt="防災の画面" loading="lazy"></div>
+      <div class="txt">
+        <span class="tag">⚠️ 防災</span>
+        <h3>警報・注意報と地震</h3>
+        <ul>
+          <li>上の帯のチップの色で、今の状態が分かります：<b style="color:var(--red)">赤</b>＝警報・特別警報、<b style="color:var(--orange)">橙</b>＝注意報だけ、灰色＝警報なし。</li>
+          <li>押すと、天気に登録した場所ごとの警報・注意報と、直近24時間の地震（登録した場所の震度つき）。</li>
+          <li>情報は気象庁から10分ごとに取ります。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row rev">
+      <div class="phone"><img src="guide/train.jpg" alt="運行情報の画面" loading="lazy"></div>
+      <div class="txt">
+        <span class="tag">🚃 運行情報</span>
+        <h3>よく乗る路線の、今の状態</h3>
+        <ul>
+          <li>上の帯の路線名の横に「平常」や状況が出ます。<b style="color:var(--orange)">橙</b>＝遅れ、<b style="color:var(--red)">赤</b>＝見合わせ。</li>
+          <li>押すと、詳しい説明と Yahoo!路線情報へのリンク。</li>
+          <li>路線は ⚙︎ の「運行情報の路線」で、名前で検索して3つまで選べます。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="phone"><img src="guide/search.jpg" alt="記事の検索の画面" loading="lazy"></div>
+      <div class="txt">
+        <span class="tag">🔍 検索</span>
+        <h3>全部のタブの記事から探す</h3>
+        <ul>
+          <li>右上の虫めがねで検索のページ。言葉をスペースで区切ると、全部を含む記事に絞り込みます。</li>
+          <li>対象は、30分ごとに集めている最近の記事です。見つからないときは Google ニュースで探すボタンが出ます。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row rev">
+      <div class="phone"><img src="guide/later.jpg" alt="あとで読むの画面" loading="lazy"></div>
+      <div class="txt">
+        <span class="tag">🔖 あとで読む</span>
+        <h3>気になった記事を取っておく</h3>
+        <ul>
+          <li>記事の下の 🔖 を押すと追加。右上のしおりのボタンで一覧です。</li>
+          <li>PC で取っておいた記事を、スマホで読むこともできます（200件まで）。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="phone"><img src="guide/release.jpg" alt="発売・公開カレンダーの画面" loading="lazy"></div>
+      <div class="txt">
+        <span class="tag">📅 発売・公開</span>
+        <h3>ゲーム・映画・ガジェットの発売日</h3>
+        <ul>
+          <li>ホームの「発売・公開」の「もっと見る」で、60日先までのカレンダー。</li>
+          <li>ゲームはファミ通、映画は映画.com から。ガジェットは、ガジェット系のタブの記事にある「○月○日発売」から拾います。</li>
+          <li>右へスワイプするか「‹ ホームに戻る」でホームへ。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row rev pcwide">
+      <div class="pc"><div class="bar"><i></i><i></i><i></i></div><img src="guide/pc-news.jpg" alt="PC での画面" loading="lazy"></div>
+      <div class="txt">
+        <span class="tag">💻 PC</span>
+        <h3>PC では広い画面で</h3>
+        <ul>
+          <li>タブが見切れているときは、端の ‹ › を押すか、マウスのホイールで横に動かせます。</li>
+          <li>ホームのカードの列も、‹ › やドラッグで動かせます。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="settings">
+  <div class="wrap">
+    <h2><small>SETTINGS</small>設定（⚙︎）</h2>
+    <p class="intro">右上の ⚙︎ で設定を開きます。変えたら、上の「保存」を押してください（お知らせメールのスイッチなど、押した瞬間に変わるものもあります）。設定は、デザインと文字の大きさ以外は PC とスマホで共通です。</p>
+    <div class="sets">
+      <div class="set"><img src="guide/set-tabs.jpg" alt="タブの設定" loading="lazy"><div><b>タブとサイト</b><p>「＋タブ」でタブを追加。☰ のドラッグか ↑↓ で並べ替え、使わないタブは「非表示」。タブの中身には、ニュースサイトや YouTube のチャンネルのアドレスを入れるだけで記事が取れます（✓／✗ で取れるか分かります）。</p></div></div>
+      <div class="set"><img src="guide/set-place.jpg" alt="天気の場所の設定" loading="lazy"><div><b>天気の場所・運行情報の路線</b><p>地名で検索して、候補を押すと追加。天気は3か所、路線は3つまで。1か所目がホームの天気になります。</p></div></div>
+      <div class="set"><img src="guide/set-notify.jpg" alt="お知らせの設定" loading="lazy"><div><b>お知らせ（メール・プッシュ通知）</b><p>朝のまとめ・通勤時間帯の電車の遅れと雨・警報・注目ワードの新着を知らせます。メールは全端末で共通の1つのスイッチ、プッシュ通知は<b>端末ごと</b>に ON／OFF。「テスト通知」で届くか確かめられます。</p></div></div>
+      <div class="set"><img src="guide/set-design.jpg" alt="デザインの設定" loading="lazy"><div><b>デザイン・文字の大きさ・注目ワード</b><p>デザインは「標準」と「カード（ダーク）」。注目ワードを含む記事は ★ で目立たせ、ミュートワードを含む記事は出しません。</p></div></div>
+      <div class="set"><img src="guide/set-key.jpg" alt="合言葉の設定" loading="lazy"><div><b>Diurna（アプリ版）と合言葉</b><p>ほかの端末用のリンクのコピーと、合言葉の作り直し。このガイドもここから開けます。</p></div></div>
+      <div class="set"><div style="font-size:44px;padding:28px 16px 0">✨</div><div><b>AI 要約</b><p>Google の Gemini の API キー（無料枠あり）を入れると、記事の「要約」ボタンと、ホームの AI 今日のまとめが使えます。キーは Google AI Studio で作れます。</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <h2><small>FAQ</small>よくある質問</h2>
+    <p class="intro">困ったときは、まずここを見てください。</p>
+    <details><summary>プッシュ通知が届きません</summary>
+      <ul>
+        <li>iPhone・iPad は、<b>ホーム画面に追加した Diurna から開いたとき</b>だけ使えます（iOS 16.4 以降）。Safari から開いた画面では ON にできません。</li>
+        <li>⚙︎ →「この端末にプッシュ通知する」を ON にし、通知の許可を「許可」にします。ON にできたら「テスト通知」を押してください。</li>
+        <li>PC の Edge は、許可の確認がウィンドウの上の小さなベルのマークにしまわれることがあります。ベルを押して「許可」にしてください。</li>
+        <li>「許可しない」にしてしまったら、iPhone は「設定」→「通知」→ Diurna、PC はアドレス欄の左の鍵のマークから許可します。</li>
+        <li>Windows の「集中モード」が ON だと、通知は右下の一覧に入るだけで表示されません。</li>
+      </ul>
+    </details>
+    <details><summary>同じお知らせが2つ届きます</summary>
+      <p>メールとプッシュ通知の両方が ON か、Edge と Chrome など2つのアプリでプッシュ通知を ON にしているためです。いらない方を OFF にしてください。</p>
+    </details>
+    <details><summary>合言葉の画面がまた出ました</summary>
+      <ul>
+        <li>合言葉が作り直されたか、その端末の保存が消えたときに出ます。新しい合言葉か、ほかの端末から送ったリンクで開き直してください。</li>
+        <li>iPhone で Safari とホーム画面のアプリの両方を使うときは、それぞれで合言葉を入れます。</li>
+      </ul>
+    </details>
+    <details><summary>画面が新しくなりません／古い記事が出ます</summary>
+      <ul>
+        <li>右上の更新ボタンを押すと、記事を取り直します。</li>
+        <li>アプリを一度閉じて開き直すと、新しい画面になります。</li>
+        <li>記事は30分ごとに集めているので、サイトに出てすぐの記事は少し遅れて出ます。</li>
+      </ul>
+    </details>
+    <details><summary>サイトを追加したのに ✗ になります</summary>
+      <ul>
+        <li>サイトのトップページのアドレスを入れてみてください。RSS（記事の一覧）が見つかれば、それを使います。なければページから見出しを読み取ります。</li>
+        <li>ログインが必要なサイトや、プログラムからのアクセスを断るサイトは取れないことがあります。取れないときは、そのサイトの Google ニュースを代わりに使います。</li>
+      </ul>
+    </details>
+    <details><summary>写真が出ない記事があります</summary>
+      <p>記事のページに代表の写真がないときや、Google ニュース経由で取っているサイトでは、写真が出ないことがあります。</p>
+    </details>
+    <details><summary>電車の運行情報や天気は、どこから取っていますか？</summary>
+      <p>天気は Open-Meteo、警報・地震・台風は気象庁、運行情報は Yahoo!路線情報、話題のキーワードは Google トレンド、よく読まれている記事は Yahoo!ニュースから取っています。それぞれの公式の情報もあわせて確認してください。</p>
+    </details>
+    <details><summary>Diurna という名前の由来は？</summary>
+      <p>古代ローマで毎日掲示された官報「Acta Diurna（アクタ・ディウルナ）」から取りました。ラテン語で「毎日の」という意味で、世界で最初の新聞とも言われます。アイコンは、新聞と頭文字の D です。</p>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <img src="icon-192.png" alt="">
+    <div><b class="serif" style="color:var(--tx);font-size:17px">Diurna</b><br>個人用のニュースアプリです。記事の著作権は各サイトにあります。<br><a href="./">Diurna を開く ›</a></div>
+  </div>
+</footer>
+
+</body>
+</html>
