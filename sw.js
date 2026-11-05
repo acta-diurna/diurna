@@ -2,7 +2,7 @@
 // - 画面のファイル（同じ場所のもの）：つながるときは新しいものを取り、つながらないときは前回のものを出す
 // - プッシュ通知：届くのは中身のない合図だけ。合言葉で GAS の getPushInbox から中身を取って表示する
 //   （合言葉・窓口・端末の番号は、画面が caches の diurna-cfg に入れておく）
-const CACHE = 'diurna-v2';
+const CACHE = 'diurna-v3';
 const CFG = 'diurna-cfg';
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -14,7 +14,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
   if (e.request.method !== 'GET' || u.origin !== location.origin) return;
-  e.respondWith(fetch(e.request).then(r => {
+  // ブラウザの一時保存（10分）を使わず、毎回新しいものを確かめる
+  e.respondWith(fetch(e.request.url, { cache: 'no-cache' }).then(r => {
     if (r.ok) { const cp = r.clone(); caches.open(CACHE).then(c => c.put(e.request, cp)); }
     return r;
   }).catch(() => caches.match(e.request, { ignoreSearch: true }).then(r => r || caches.match('./'))));
