@@ -2,7 +2,7 @@
 // - 画面のファイル（同じ場所のもの）：つながるときは新しいものを取り、つながらないときは前回のものを出す
 // - プッシュ通知：届くのは中身のない合図だけ。合言葉で GAS の getPushInbox から中身を取って表示する
 //   （合言葉・窓口・端末の番号は、画面が caches の diurna-cfg に入れておく）
-const CACHE = 'diurna-v4';
+const CACHE = 'diurna-v5';
 const CFG = 'diurna-cfg';
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -23,17 +23,31 @@ self.addEventListener('fetch', e => {
 
 self.addEventListener('push', e => {
   e.waitUntil((async () => {
-    let items = [];
-    try {
-      const res = await (await caches.open(CFG)).match('cfg');
-      const cfg = res ? await res.json() : null;
-      if (cfg && cfg.k) {
-        const r = await fetch(cfg.api, { method: 'POST', body: JSON.stringify({ k: cfg.k, fn: 'getPushInbox', args: [cfg.id || ''] }) }).then(r => r.json());
-        items = Array.isArray(r.result) ? r.result : [];
+    let items = [], cfg = null, why = '';
+    try { const res = await (await caches.open(CFG)).match('cfg'); cfg = res ? await res.json() : null; } catch (err) { why = 'cfg ' + err; }
+    // 2026/11/27：サーバーは中身を返したのに、iPhone が返事を受け取れず「新しいお知らせがあります」になった（夜のまとめ）。
+    // GAS の返事は別のアドレスへ転送されて届くので、その途中で失敗することがある → 3回まで取り直す（サーバーは15分以内の最新1件を返す）。
+    // 失敗したわけは、次に取りに行くときにサーバーへ伝える（errlog に残る）
+    if (cfg && cfg.k) {
+      let prev = '';
+      try { const p = await (await caches.open(CFG)).match('err'); prev = p ? await p.text() : ''; } catch (err) { }
+      for (let i = 0; i < 3 && !items.length; i++) {
+        if (i) await new Promise(r => setTimeout(r, 1500));
+        const ac = typeof AbortController === 'function' ? new AbortController() : null;
+        const tm = ac ? setTimeout(() => ac.abort(), 12000) : 0;
+        try {
+          const r = await fetch(cfg.api, { method: 'POST', signal: ac ? ac.signal : undefined,
+            body: JSON.stringify({ k: cfg.k, fn: 'getPushInbox', args: [cfg.id || '', (prev ? prev + ' / ' : '') + (why ? '失敗' + i + '回 ' + why : '')] }) }).then(r => r.json());
+          if (r.error) { why = String(r.error); break; }
+          items = Array.isArray(r.result) ? r.result : [];
+          prev = ''; if (!items.length) break;
+        } catch (err) { why = String(err && err.name || err).slice(0, 80); }
+        clearTimeout(tm);
       }
-    } catch (err) { }
+      try { const c = await caches.open(CFG); if (items.length) await c.delete('err'); else if (why) await c.put('err', new Response(new Date().toISOString().slice(5, 16) + ' ' + why)); } catch (err) { }
+    }
     // iPhone は合図を受けたら必ず通知を出す決まりなので、中身を取れなくても1つ出す
-    if (!items.length) items = [{ id: 'diurna', title: 'Diurna', body: '新しいお知らせがあります', url: './' }];
+    if (!items.length) items = [{ id: 'diurna', title: 'Diurna', body: '新しいお知らせがあります（押すと Diurna が開きます）', url: './' }];
     await Promise.all(items.slice(-3).map(it => self.registration.showNotification(it.title || 'Diurna', {
       body: it.body || '', icon: 'icon-192.png', badge: 'icon-192.png', tag: it.id || 'diurna', data: { url: it.url || './' },
     })));
